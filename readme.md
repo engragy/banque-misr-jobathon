@@ -1,4 +1,4 @@
-a simple application that has a simple API with only one end-point (/live).
+a simple application written with [python, django, django-framework] that has a simple API with only one end-point (/live).
 this endpoint will respond with "Well Done" or "Maintenance" if the system can interact with its Database.
 
 i have created docker files for the system to be containerized (MicroServices).
