@@ -1,0 +1,43 @@
+version: '3.9'
+
+networks:
+  default:
+    name: my-containers
+    external: true
+
+services:
+  the-db:
+    container_name: the-db
+    image: postgres:15.4-bookworm
+    volumes:
+      - /home/jobathon/pg_data:/var/lib/postgresql/data/
+    env_file:
+      - ./.env.new
+
+  the-web:
+    container_name: the-web
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    command: gunicorn jobathon.wsgi:application --bind 0.0.0.0:8000 --timeout 1000 --access-logfile -
+    volumes:
+      - /home/jobathon/static_root:/home/jobathon/static_root
+      - /home/jobathon/media_root:/home/jobathon/media_root
+    expose:
+      - 8000
+    env_file:
+      - ./.env
+    depends_on:
+      - the-db
+
+  the-web-proxy:
+    container_name: the-web-proxy
+    restart: always
+    build:
+      context: ./nginx
+    volumes:
+      - /home/jobathon/static_root:/usr/src/static_root
+      - /home/jobathon/media_root:/usr/src/media_root
+    depends_on:
+      - the-web
